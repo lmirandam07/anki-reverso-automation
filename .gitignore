@@ -133,3 +133,6 @@ dmypy.json
 
 # Files
 audios/
+
+# CSV Files
+.csv
