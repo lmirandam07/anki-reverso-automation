@@ -25,7 +25,9 @@ def main():
         with open(csv_file, 'r', encoding='utf-8') as file:
             words = list(csv.reader(file))
             # Discard header of csv from the search
-            for word in shuffle(words[1:]):
+            words.pop(0)
+            shuffle(words)
+            for word in words:
                 # The 4th is the position of audio on the row
                 word_audio = word[4]
                 if word_audio:
@@ -42,7 +44,7 @@ def main():
                 deck.add_note(note)
 
         deutsch_deck.write_to_file(package_file)
-        print(f"Noted added: {len(deck.notes)}")
+        print(f"Total notes added: {len(deck.notes)}")
 
 
 

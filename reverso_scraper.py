@@ -41,30 +41,32 @@ def words_filter(words, csv_headers):
     empty_file = False
 
     with open(csv_file, 'r') as file:
-        reader = list(csv.reader(file))
+      reader = list(csv.reader(file))
 
-        # If the file only has headers
-        if len(reader) == 1 or reader[2] != "\n":
-            return words
+      # If the file only has headers
+      if len(reader) == 1:
+        return words
 
-        # If the file is empty
-        if len(reader) < 1:
-            empty_file = True
-        elif len(reader) >= 2:
-            # Get the last german word, but only the word, without its article or plural
-            last_word_de = reader[-1][0].split(" ")[1]
+      # If the file is empty
+      if len(reader) < 1:
+        empty_file = True
+      elif len(reader) >=2:
+        # Get the last german word, but only the word without its article or plural
+        last = reader[-1][0]
+        last_word_de = last.split(" ")[1] if len(last) > 1 else last
 
     if empty_file:
-        with open(csv_file, 'w', encoding='utf-8', newline='') as file:
-            writer = csv.writer(file)
+      with open(csv_file, 'w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(list(csv_headers.keys()))
 
-            writer.writerow(csv_headers.keys() + "\n")
-            return words
+        return words
 
-    last_updated_idx = words.index(list(filter(
-        lambda w: w['srcText'] == last_word_de if w['srcLang'] == 'de' else w['trgText'] == last_word_de, words))[0])
+    # Get the index of the last added word
+    last_updt_idx = list(filter(lambda w: w['srcText'] == last_word_de if w['srcLang'] == 'de' else w['trgText'] == last_word_de, words))
+    last_updt_idx = words.index(last_updt_idx[0]) if len(last_updt_idx) == 1 else 0
 
-    return words[:last_updated_idx]
+    return words[:last_updt_idx]
 
 
 def get_word_tag(de_word):
@@ -206,14 +208,13 @@ def get_words_list(word, words_dict):
 
 def save_words_csv(words_list):
     csv_file = Path("./words_list.csv")
-    with open(csv_file, 'a', encoding='utf-8', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=words_list[0].keys())
-        for w in words_list:
-            writer.writerow(w)
+    fieldnames = dict(words_list[0]).keys()
+    with open(csv_file, 'a+', encoding='utf-8', newline='') as file:
+      writer = csv.DictWriter(file, fieldnames=fieldnames)
+      for w in words_list:
+        writer.writerow(w)
     # TODO: Loggear la cantidad de palabras que se han añadido nuevas
-    print(
-        f'Se ha completado el proceso correctamente, se han añadido {len(words_list)} palabras')
-
+    print(f'Se ha completado el proceso correctamente, se han añadido {len(words_list)} palabras')
 
 def csv_words_creator():
     # logging.basicConfig(filename='scraper.log', level=logging.INFO)
@@ -239,10 +240,12 @@ def csv_words_creator():
 
     filtered_words = words_filter(words_results, words_dict)
 
-    words_dict_list = [get_words_list(f_w, words_dict)
-                       for f_w in filtered_words]
+    if len(filtered_words) >= 1:
+        words_dict_list = [get_words_list(f_w, words_dict) for f_w in filtered_words]
+        save_words_csv(words_dict_list)
+    else:
+        print('No hay palabras nuevas para añadir')
 
-    save_words_csv(words_dict_list)
     return True
 
 
