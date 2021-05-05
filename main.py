@@ -14,9 +14,9 @@ def main():
     '''
     Create Anki Deck
     '''
-    csv_words_status = csv_words_creator()
+    first_new_word = csv_words_creator()
 
-    if csv_words_status:
+    if first_new_word:
         csv_file = Path("./words_list.csv")
         package_file = "Deutsch.apkg"
         deck = genanki.Deck(1613951331974, "Deutsch")
@@ -24,27 +24,30 @@ def main():
 
         with open(csv_file, 'r', encoding='utf-8') as file:
             words = list(csv.reader(file))
+            first_nw_idx = words.index(first_new_word)
+            words = words[first_nw_idx:]
             # Discard header of csv from the search
             words.pop(0)
             shuffle(words)
             for word in words:
-                # The 4th is the position of audio on the row
-                word_audio = word[4]
-                if word_audio:
-                    audio_path = Path(f"./audios/{word_audio}")
-                    deutsch_deck.media_files.append(audio_path)
-                    word_audio = f"[sound:{word_audio}]"
+                print(word)
+        #         # The 4th is the position of audio on the row
+        #         word_audio = word[4]
+        #         if word_audio:
+        #             audio_path = Path(f"./audios/{word_audio}")
+        #             deutsch_deck.media_files.append(audio_path)
+        #             word_audio = f"[sound:{word_audio}]"
 
-                note = DeutschNote(
-                    model = VOCAB_REVERSE_TEMPLATE,
-                    fields= [*word[:-1]], # The last field is the tag
-                    tags=word[-1]
-                )
+        #         note = DeutschNote(
+        #             model = VOCAB_REVERSE_TEMPLATE,
+        #             fields= [*word[:-1]], # The last field is the tag
+        #             tags=word[-1]
+        #         )
 
-                deck.add_note(note)
+        #         deck.add_note(note)
 
-        deutsch_deck.write_to_file(package_file)
-        print(f"Total notes added: {len(deck.notes)}")
+        # deutsch_deck.write_to_file(package_file)
+        # print(f"Total de notas añadidas: {len(deck.notes)}")
 
 
 

@@ -34,39 +34,38 @@ def reverso_request(start, length):
         print(e)
 
 
-# Function to drop the duplicated words from the JSON
+# Function to drop the duplicated words_rv from the JSON
 def words_filter(words, csv_headers):
     csv_file = Path("./words_list.csv")
     csv_file.touch(exist_ok=True)
     empty_file = False
-
-    with open(csv_file, 'r') as file:
+    words_rv = words[::-1] # Changing the word order so them are saved from first to last updated
+    with open(csv_file, 'r', encoding='utf-8') as file:
       reader = list(csv.reader(file))
 
       # If the file only has headers
       if len(reader) == 1:
-        return words
+        return words_rv
 
       # If the file is empty
       if len(reader) < 1:
         empty_file = True
       elif len(reader) >=2:
         # Get the last german word, but only the word without its article or plural
-        last = reader[-1][0]
-        last_word_de = last.split(" ")[1] if len(last) > 1 else last
+        last = reader[-1][0].split(" ")
+        last_word_de = last[1] if len(last) > 1 else last
 
     if empty_file:
       with open(csv_file, 'w', encoding='utf-8', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(list(csv_headers.keys()))
 
-        return words
-
+        return words_rv
     # Get the index of the last added word
-    last_updt_idx = list(filter(lambda w: w['srcText'] == last_word_de if w['srcLang'] == 'de' else w['trgText'] == last_word_de, words))
-    last_updt_idx = words.index(last_updt_idx[0]) if len(last_updt_idx) == 1 else 0
+    last_updt_idx = list(filter(lambda w: w['srcText'] == last_word_de[0] if w['srcLang'] == 'de' else w['trgText'] == last_word_de[0], words_rv))
+    last_updt_idx = words_rv.index(last_updt_idx[0]) if len(last_updt_idx) == 1 else 0
 
-    return words[:last_updt_idx]
+    return words_rv[last_updt_idx+1:]
 
 
 def get_word_tag(de_word):
@@ -243,10 +242,10 @@ def csv_words_creator():
     if len(filtered_words) >= 1:
         words_dict_list = [get_words_list(f_w, words_dict) for f_w in filtered_words]
         save_words_csv(words_dict_list)
+        return words_dict_list[0]
     else:
         print('No hay palabras nuevas para añadir')
-
-    return True
+        return False
 
 
 if __name__ == '__main__':
