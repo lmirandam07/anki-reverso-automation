@@ -20,7 +20,6 @@ VOCAB_REVERSE_TEMPLATE = genanki.Model(
         {"name": "de_audio"},
         {"name": "es_word"},
         {"name": "es_sentence"},
-        {"name": "es_note"},
     ],
 
     templates= [

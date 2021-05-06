@@ -40,7 +40,7 @@ def main():
                 note = DeutschNote(
                     model = VOCAB_REVERSE_TEMPLATE,
                     fields= [*word[:-1]], # The last field is the tag
-                    tags=word[-1]
+                    tags=[word[-1]]
                 )
 
                 deck.add_note(note)
