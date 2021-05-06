@@ -134,5 +134,8 @@ dmypy.json
 # Files
 audios/
 
-# CSV Files
+# CSV files
 *.csv
+
+# apkg files
+*.apkg
