@@ -1,8 +1,14 @@
+# To add a new cell, type ''
+# To add a new markdown cell, type ' [markdown]'
+
 import csv
+import time
 import logging
 import requests
+from pprint import pprint
 from uuid import uuid4
 from pathlib import Path
+from pprint import pprint
 from random import choice
 from decouple import config
 from bs4 import BeautifulSoup
@@ -39,33 +45,41 @@ def words_filter(words, csv_headers):
     csv_file = Path("./words_list.csv")
     csv_file.touch(exist_ok=True)
     empty_file = False
-    words_rv = words[::-1] # Changing the word order so them are saved from first to last updated
+    # Changing the word order so them are saved from first to last updated
+    words_rv = words[::-1]
     with open(csv_file, 'r', encoding='utf-8') as file:
-      reader = list(csv.reader(file))
+        reader = list(csv.reader(file))
 
-      # If the file only has headers
-      if len(reader) == 1:
-        return words_rv
+        # If the file only has headers
+        if len(reader) == 1:
+            return words_rv
 
-      # If the file is empty
-      if len(reader) < 1:
-        empty_file = True
-      elif len(reader) >=2:
-        # Get the last german word, but only the word without its article or plural
-        last = reader[-1][0].split(" ")
-        last_word_de = last[1] if len(last) > 1 else last
+        # If the file is empty
+        if len(reader) < 1:
+            empty_file = True
+        elif len(reader) >= 2:
+            # Get the last german word, but only the word without its article or plural
+            last = reader[-1][0].split(" ")
+            last_word_de = last[1] if len(last) > 1 else last[0]
 
     if empty_file:
-      with open(csv_file, 'w', encoding='utf-8', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(list(csv_headers.keys()))
+        with open(csv_file, 'w', encoding='utf-8', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(list(csv_headers.keys()))
+            file.close()
 
         return words_rv
-    # Get the index of the last added word
-    last_updt_idx = list(filter(lambda w: w['srcText'] == last_word_de[0] if w['srcLang'] == 'de' else w['trgText'] == last_word_de[0], words_rv))
-    last_updt_idx = words_rv.index(last_updt_idx[0]) if len(last_updt_idx) == 1 else 0
 
-    return words_rv[last_updt_idx+1:]
+    # Get the index of the last added word
+    last_updt_idx = list(filter(lambda w: w['srcText'] == last_word_de
+                         if w['srcLang'] == 'de' else w['trgText'] == last_word_de, words_rv))
+    last_updt_idx = words_rv.index(
+        last_updt_idx[0]) + 1 if len(last_updt_idx) == 1 else False
+
+    if last_updt_idx:
+        return words_rv[last_updt_idx:]
+
+    return []
 
 
 def get_word_tag(de_word):
@@ -163,6 +177,12 @@ def get_sentence_audio(de_sentence):
 
         response = requests.post(azure_api_url, headers=headers, data=body)
 
+        # If there are too manny requests try again after some time
+        if response.status_code == 429:
+            retry_after = response.headers.get('Retry_After')
+            time.sleep(int(retry_after) if retry_after else 10)
+            response = requests.post(azure_api_url, headers=headers, data=body)
+
         if response.status_code in range(200, 300):
             audio_folder = Path("./audios")
             audio_folder.mkdir(exist_ok=True)
@@ -172,6 +192,7 @@ def get_sentence_audio(de_sentence):
             if not audio_file_path.exists():
                 with open(audio_file_path, 'wb') as audio:
                     audio.write(response.content)
+                    audio.close()
 
                 return audio_file_name.name
 
@@ -209,11 +230,14 @@ def save_words_csv(words_list):
     csv_file = Path("./words_list.csv")
     fieldnames = dict(words_list[0]).keys()
     with open(csv_file, 'a+', encoding='utf-8', newline='') as file:
-      writer = csv.DictWriter(file, fieldnames=fieldnames)
-      for w in words_list:
-        writer.writerow(w)
-    # TODO: Loggear la cantidad de palabras que se han añadido nuevas
-    print(f'Se ha completado el proceso correctamente, se han añadido {len(words_list)} palabras')
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        for w in words_list:
+            writer.writerow(w)
+        file.close()
+
+    print(
+        f'Se ha completado el proceso correctamente, se han añadido {len(words_list)} palabras')
+
 
 def csv_words_creator():
     # logging.basicConfig(filename='scraper.log', level=logging.INFO)
@@ -240,9 +264,10 @@ def csv_words_creator():
     filtered_words = words_filter(words_results, words_dict)
 
     if len(filtered_words) >= 1:
-        words_dict_list = [get_words_list(f_w, words_dict) for f_w in filtered_words]
+        words_dict_list = [get_words_list(f_w, words_dict)
+                           for f_w in filtered_words]
         save_words_csv(words_dict_list)
-        return words_dict_list[0]
+        return len(words_dict_list)
     else:
         print('No hay palabras nuevas para añadir')
         return False
