@@ -1,14 +1,9 @@
-# To add a new cell, type ''
-# To add a new markdown cell, type ' [markdown]'
-
 import csv
 import time
 import logging
 import requests
-from pprint import pprint
 from uuid import uuid4
 from pathlib import Path
-from pprint import pprint
 from random import choice
 from decouple import config
 from bs4 import BeautifulSoup
@@ -38,7 +33,6 @@ def reverso_request(start, length):
         return request.json()
     except requests.exceptions.HTTPError as e:
         print(e)
-
 
 # Function to drop the duplicated words_rv from the JSON
 def words_filter(words, csv_headers):
