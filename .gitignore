@@ -139,3 +139,6 @@ audios/
 
 # apkg files
 *.apkg
+
+# Project files
+/exec_date.txt
