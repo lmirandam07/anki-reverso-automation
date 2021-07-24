@@ -3,9 +3,9 @@ import genanki
 from pathlib import Path
 from random import shuffle
 from model import VOCAB_REVERSE_TEMPLATE
-from reverso_scraper import csv_words_creator
+from reverso_favs2anki import ReversoFavs2Anki
 
-class DeutschNote(genanki.Note):
+class Note(genanki.Note):
     @property
     def guid(self):
         return genanki.guid_for(self.fields[0])
@@ -37,7 +37,7 @@ def main():
                     deutsch_deck.media_files.append(audio_path)
                     word[4] = f"[sound:{word_audio}]"
 
-                note = DeutschNote(
+                note = Note(
                     model = VOCAB_REVERSE_TEMPLATE,
                     fields= [*word[:-1]], # The last field is the tag
                     tags=[word[-1]]
