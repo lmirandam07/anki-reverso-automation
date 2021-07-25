@@ -88,7 +88,7 @@ class AzureAudio:
             # If there are too manny requests try again after some time
             if response.status_code == 429:
                 retry_after = response.headers.get('Retry_After')
-                time.sleep(int(retry_after) if retry_after else 10)
+                time.sleep(int(retry_after) if retry_after else 60)
                 response = requests.post(
                     azure_api_url, headers=headers, data=body)
 

@@ -96,13 +96,12 @@ def get_word_tag(de_word):
 
 
 def get_noun_article(de_word):
-    leo_url = f"https://dict.leo.org/alem%C3%A1n-espa%C3%B1ol/{de_word}"
+    leo_url = f"https://dict.leo.org/spanisch-deutsch/{de_word}"
 
     try:
         req = requests.get(leo_url, headers=headers)
         soup = BeautifulSoup(req.text, "html.parser")
         de_noun = soup.select("#section-subst td[lang='de'] samp")
-
         de_article = de_noun[0].text.split(' ')[0] or ''
         de_plural = de_noun[0].find('small').text or ''
         de_word = f"{de_article} {de_word} - {de_plural}"
