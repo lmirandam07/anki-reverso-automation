@@ -1,5 +1,8 @@
-from typing import ClassVar
 import genanki
+
+DECK_NAME = "Deutsch"
+PACKAGE_NAME = f"{DECK_NAME}.apkg"
+DECK_ID = 1613951331974
 
 STYLE_TEMPLATE = """
 .card {
@@ -12,7 +15,7 @@ STYLE_TEMPLATE = """
 """
 
 VOCAB_REVERSE_TEMPLATE = genanki.Model(
-    1613951331974,
+    DECK_ID,
     "Goethe Vocab List (ESP)",
     fields=[
         {"name": "de_word"},

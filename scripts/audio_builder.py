@@ -57,7 +57,7 @@ class AzureAudio:
 
             rate = 0
             pitch = 0
-            print(azure_access_token)
+
             azure_api_url = f'https://{azure_region}.tts.speech.microsoft.com/cognitiveservices/v1'
             headers = {
                 'Authorization': f'Bearer {azure_access_token}',

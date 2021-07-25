@@ -1,8 +1,8 @@
 import csv
+import model
 import genanki
 from pathlib import Path
 from random import shuffle
-from model import VOCAB_REVERSE_TEMPLATE
 from reverso_favs2anki import ReversoFavs2Anki
 
 class Note(genanki.Note):
@@ -14,7 +14,6 @@ def main():
     '''
     Create Anki Deck
     '''
-    num_new_words = csv_words_creator()
 
     if num_new_words:
         csv_file = Path("./words_list.csv")
