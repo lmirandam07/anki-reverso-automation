@@ -141,4 +141,4 @@ audios/
 *.apkg
 
 # Project files
-/exec_date.txt
+files/*
