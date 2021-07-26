@@ -86,11 +86,12 @@ class AzureAudio:
                 azure_api_url, headers=headers, data=body)
 
             # If there are too manny requests try again after some time
-            if response.status_code == 429:
+            if response.status_code not in range(200, 300):
                 retry_after = response.headers.get('Retry_After')
-                time.sleep(int(retry_after) if retry_after else 60)
+                time.sleep(int(retry_after) if retry_after else 10)
                 response = requests.post(
                     azure_api_url, headers=headers, data=body)
+
 
             if response.status_code in range(200, 300):
                 audio_folder = Path("../files/audios")

@@ -19,8 +19,8 @@ VOCAB_REVERSE_TEMPLATE = genanki.Model(
     "Goethe Vocab List (ESP)",
     fields=[
         {"name": "de_word"},
-        {"name": "de_sentence"},
         {"name": "es_word"},
+        {"name": "de_sentence"},
         {"name": "es_sentence"},
         {"name": "de_audio"},
     ],
