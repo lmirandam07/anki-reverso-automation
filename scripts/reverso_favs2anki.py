@@ -110,7 +110,7 @@ class ReversoFavs2Anki():
 
             if self.audio:
                 words_dict[f'{src_l}_audio'] = self.get_sentence_audio(
-                    f'{src_l}_sentence')
+                    words_dict[f'{src_l}_sentence'])
 
             words_list.append(words_dict)
 
