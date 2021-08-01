@@ -142,3 +142,6 @@ audios/
 
 # Project files
 files/*
+
+# Bat files
+*.bat
