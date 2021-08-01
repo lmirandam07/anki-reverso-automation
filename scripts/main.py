@@ -1,13 +1,16 @@
 import csv
 import model
+import time
 import logging
 import genanki
 from pathlib import Path
 from random import shuffle
+from win10toast import ToastNotifier
 from reverso_favs2anki import ReversoFavs2Anki
 
 logging.basicConfig(filename='main.log', level=logging.INFO,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+
 
 class Note(genanki.Note):
     @property
@@ -45,7 +48,15 @@ def main():
             deck.add_note(note)
 
     deutsch_deck.write_to_file(f"../files/{model.PACKAGE_NAME}")
-    logging.info(f"Total number of notes appended to anki deck: {len(deck.notes)}")
+    logging.info(
+        f"Total number of notes appended to anki deck: {len(deck.notes)}")
+    toaster = ToastNotifier()
+    toaster.show_toast("ReversoFavs2Anki",
+                       f"Script executed correctly, {len(deck.notes)} notes were added",
+                       duration=30)
+
+    while toaster.notification_active():
+        time.sleep(0.1)
 
 
 if __name__ == '__main__':
