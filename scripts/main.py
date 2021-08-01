@@ -1,14 +1,19 @@
 import csv
 import model
+import logging
 import genanki
 from pathlib import Path
 from random import shuffle
 from reverso_favs2anki import ReversoFavs2Anki
 
+logging.basicConfig(filename='main.log', level=logging.INFO,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+
 class Note(genanki.Note):
     @property
     def guid(self):
         return genanki.guid_for(self.fields[0])
+
 
 def main():
     '''
@@ -32,16 +37,15 @@ def main():
                 word[4] = f"[sound:{word_audio}]"
 
             note = Note(
-                model = model.VOCAB_REVERSE_TEMPLATE,
-                fields= [*word[:-1]], # The last field is the tag
+                model=model.VOCAB_REVERSE_TEMPLATE,
+                fields=[*word[:-1]],  # The last field is the tag
                 tags=[word[-1]]
             )
 
             deck.add_note(note)
 
     deutsch_deck.write_to_file(f"../files/{model.PACKAGE_NAME}")
-    print(f"Total de notas añadidas a Anki: {len(deck.notes)}")
-
+    logging.info(f"Total number of notes appended to anki deck: {len(deck.notes)}")
 
 
 if __name__ == '__main__':
